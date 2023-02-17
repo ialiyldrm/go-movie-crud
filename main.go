@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -20,6 +21,11 @@ type Director struct {
 	LastName  string `json:"lastname"`
 }
 
+func getMovies(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(movies)
+}
+
 var movies []Movie
 
 func main() {
@@ -28,6 +34,7 @@ func main() {
 	movies = append(movies, Movie{ID: "1", Isbn: "123456", Title: "Matrix", Director: &Director{FirstName: "John", LastName: "Doe"}})
 	movies = append(movies, Movie{ID: "2", Isbn: "123457", Title: "Matrix 2", Director: &Director{FirstName: "Steve", LastName: "Smith"}})
 
+	r.HandleFunc("/movies", getMovies).Methods("GET")
 	fmt.Printf("Starting server at port 8080\n")
 	log.Fatal(http.ListenAndServe(":8080", r))
 
